@@ -21,7 +21,7 @@ def main():
 
 def pip_freeze():
     """Get the output of pip freeze as a set of package=version strings."""
-    return set(subprocess.check_output(["pip", "freeze"], text=True).splitlines())
+    return set(subprocess.check_output([sys.executable, "-m", "pip", "freeze"], text=True).splitlines())
 
 
 def read_requirements(filename):
