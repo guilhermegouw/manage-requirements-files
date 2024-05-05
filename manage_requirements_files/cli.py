@@ -4,7 +4,9 @@ import sys
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Manage Python project dependencies.")
+    parser = argparse.ArgumentParser(
+        description="Manage Python project dependencies."
+    )
     parser.add_argument(
         "mode",
         choices=["prod", "dev"],
@@ -21,11 +23,16 @@ def main():
 
 def pip_freeze():
     """Get the output of pip freeze as a set of package=version strings."""
-    return set(subprocess.check_output([sys.executable, "-m", "pip", "freeze"], text=True).splitlines())
+    return set(
+        subprocess.check_output(
+            [sys.executable, "-m", "pip", "freeze"], text=True
+        ).splitlines()
+    )
 
 
 def read_requirements(filename):
-    """Read a requirements file and return its contents as a set, create if not exist."""
+    """Read a requirements file and return its contents as a set,\
+        automatically create if not exist."""
     try:
         with open(filename, "r") as file:
             return set(line.strip() for line in file if line.strip())
@@ -42,20 +49,20 @@ def write_requirements(filename, new_lines):
 
 
 def update_requirements(target_file, other_file):
-    """Update the target requirements file with new dependencies, automatically creating files if they don't exist."""
-    # Step 1: Get current environment packages
+    """Update the target requirements file with new dependencies,\
+        automatically creating files if they don't exist."""
     current_packages = pip_freeze()
+    existing_deps = read_requirements(target_file) | read_requirements(
+        other_file
+    )
 
-    # Step 2: Read existing requirements from both files
-    existing_deps = read_requirements(target_file) | read_requirements(other_file)
-
-    # Step 3: Identify new dependencies
     new_dependencies = current_packages - existing_deps
 
-    # Step 4: Update the target requirements file with new dependencies
     if new_dependencies:
         write_requirements(target_file, new_dependencies)
-        print(f"Updated {target_file} with new dependencies: {new_dependencies}")
+        print(
+            f"Updated {target_file} with new dependencies: {new_dependencies}"
+        )
     else:
         print(f"No new dependencies to add to {target_file}.")
 
