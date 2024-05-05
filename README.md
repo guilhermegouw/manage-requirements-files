@@ -1,4 +1,4 @@
-# Manage Requirements Files
+# Manage Requirements Files Version: 0.1.1
 
 `manage-requirements-files` is a Python CLI tool designed to help developers efficiently manage their project dependencies. It automates the updating of `requirements.txt` and `requirements-dev.txt` by appending new dependencies from the activated Python environment.
 
