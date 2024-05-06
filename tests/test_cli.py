@@ -67,12 +67,8 @@ class TestReadRequirements(unittest.TestCase):
         expected_output = set()
         result = read_requirements("requirements.txt")
         self.assertEqual(result, expected_output)
-        self.assertEqual(
-            mock_file.call_args_list[0], call("requirements.txt", "r")
-        )
-        self.assertEqual(
-            mock_file.call_args_list[1], call("requirements.txt", "a")
-        )
+        self.assertEqual(mock_file.call_args_list[0], call("requirements.txt", "r"))
+        self.assertEqual(mock_file.call_args_list[1], call("requirements.txt", "a"))
 
 
 class TestWriteRequirements(unittest.TestCase):
@@ -122,9 +118,7 @@ class TestUpdateRequirements(unittest.TestCase):
             {"flask>=1.1"},  # Existing dependencies in other_file
         ]
 
-        update_requirements(
-            "target_requirements.txt", "other_requirements.txt"
-        )
+        update_requirements("target_requirements.txt", "other_requirements.txt")
 
         mock_write_requirements.assert_called_once_with(
             "target_requirements.txt", {"requests>=2.25"}
@@ -151,9 +145,7 @@ class TestUpdateRequirements(unittest.TestCase):
             {"flask>=1.1"},  # Existing dependencies in other_file
         ]
 
-        update_requirements(
-            "target_requirements.txt", "other_requirements.txt"
-        )
+        update_requirements("target_requirements.txt", "other_requirements.txt")
 
         mock_write_requirements.assert_not_called()
         mock_print.assert_called_once_with(
@@ -162,30 +154,33 @@ class TestUpdateRequirements(unittest.TestCase):
 
 
 class TestMainFunction(unittest.TestCase):
-    @patch('manage_requirements_files.cli.update_requirements')
-    @patch('argparse.ArgumentParser.parse_args')
+    @patch("manage_requirements_files.cli.update_requirements")
+    @patch("argparse.ArgumentParser.parse_args")
     def test_main_prod_mode(self, mock_parse_args, mock_update_requirements):
         # Setup mock to simulate command line arguments
-        mock_parse_args.return_value = MagicMock(mode='prod')
+        mock_parse_args.return_value = MagicMock(mode="prod")
 
         # Call main to test behavior
         main()
 
         # Check if update_requirements was called correctly
-        mock_update_requirements.assert_called_once_with("requirements.txt", "requirements-dev.txt")
+        mock_update_requirements.assert_called_once_with(
+            "requirements.txt", "requirements-dev.txt"
+        )
 
-    @patch('manage_requirements_files.cli.update_requirements')
-    @patch('argparse.ArgumentParser.parse_args')
+    @patch("manage_requirements_files.cli.update_requirements")
+    @patch("argparse.ArgumentParser.parse_args")
     def test_main_dev_mode(self, mock_parse_args, mock_update_requirements):
         # Setup mock to simulate command line arguments
-        mock_parse_args.return_value = MagicMock(mode='dev')
+        mock_parse_args.return_value = MagicMock(mode="dev")
 
         # Call main to test behavior
         main()
 
         # Check if update_requirements was called correctly
-        mock_update_requirements.assert_called_once_with("requirements-dev.txt", "requirements.txt")
-
+        mock_update_requirements.assert_called_once_with(
+            "requirements-dev.txt", "requirements.txt"
+        )
 
 
 if __name__ == "__main__":
