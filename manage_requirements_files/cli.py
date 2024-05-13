@@ -2,6 +2,7 @@
 import argparse
 import subprocess
 import sys
+import os
 
 
 def main():
@@ -24,11 +25,16 @@ def main():
 
 def pip_freeze():
     """Get the output of pip freeze as a set of package=version strings."""
-    return set(
-        subprocess.check_output(
-            [sys.executable, "-m", "pip", "freeze"], text=True
-        ).splitlines()
-    )
+    venv_path = os.environ.get("VIRTUAL_ENV")
+    if venv_path:
+        pip_path = os.path.join(venv_path, "bin", "pip")
+    else:
+        print("Please activate a virtual environment.")
+        sys.exit(1)
+
+    return subprocess.check_output(
+                [pip_path, "freeze"], text=True
+            ).splitlines()
 
 
 def read_requirements(filename):
