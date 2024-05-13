@@ -6,9 +6,7 @@ import os
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Manage Python project dependencies."
-    )
+    parser = argparse.ArgumentParser(description="Manage Python project dependencies.")
     parser.add_argument(
         "mode",
         choices=["prod", "dev"],
@@ -26,15 +24,18 @@ def main():
 def pip_freeze():
     """Get the output of pip freeze as a set of package=version strings."""
     venv_path = os.environ.get("VIRTUAL_ENV")
-    if venv_path:
-        pip_path = os.path.join(venv_path, "bin", "pip")
-    else:
-        print("Please activate a virtual environment.")
+    if not venv_path:
+        print("No active virtual environment found.\nDid you forget to activate it?")
         sys.exit(1)
 
-    return subprocess.check_output(
-                [pip_path, "freeze"], text=True
-            ).splitlines()
+    pip_path = os.path.join(venv_path, "bin", "pip")
+
+    try:
+        output = subprocess.check_output([pip_path, "freeze"], text=True)
+        return set(output.splitlines())
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while running pip freeze: ", e)
+        return set()
 
 
 def read_requirements(filename):
@@ -59,17 +60,13 @@ def update_requirements(target_file, other_file):
     """Update the target requirements file with new dependencies,\
         automatically creating files if they don't exist."""
     current_packages = pip_freeze()
-    existing_deps = read_requirements(target_file) | read_requirements(
-        other_file
-    )
+    existing_deps = read_requirements(target_file) | read_requirements(other_file)
 
     new_dependencies = current_packages - existing_deps
 
     if new_dependencies:
         write_requirements(target_file, new_dependencies)
-        print(
-            f"Updated {target_file} with new dependencies: {new_dependencies}"
-        )
+        print(f"Updated {target_file} with new dependencies: {new_dependencies}")
     else:
         print(f"No new dependencies to add to {target_file}.")
 
